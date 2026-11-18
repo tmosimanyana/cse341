@@ -18,6 +18,10 @@ require('./config/passport-config');
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+if (!process.env.SESSION_SECRET) {
+  throw new Error('SESSION_SECRET must be set in the environment before starting the server.');
+}
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -25,10 +29,13 @@ app.use(express.urlencoded({ extended: true }));
 
 // Session configuration
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'your-default-secret-key',
+  secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false } // Set to true in production with HTTPS
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax'
+  }
 }));
 
 // Passport middleware
