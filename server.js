@@ -5,12 +5,15 @@ const cors = require('cors');
 const path = require('path');
 const dotenv = require('dotenv');
 const swaggerUi = require('swagger-ui-express');
+const { MongoClient } = require('mongodb');
 const swaggerDocument = require('./swagger.json');
 
 // Import routes
 const authRoutes = require('./routes/auth');
 const protectedRoutes = require('./routes/protected');
 const professionalRoutes = require('./frontend/routes/professional');
+const projectsRoutes = require('./routes/projects');
+const projectsService = require('./services/projectsService');
 
 dotenv.config();
 require('./config/passport-config');
@@ -52,6 +55,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/auth', authRoutes);
 app.use('/', protectedRoutes);
 app.use('/professional', professionalRoutes);
+app.use('/api/projects', projectsRoutes);
 
 // Root route
 app.get('/', (req, res) => {
@@ -74,13 +78,34 @@ app.get('*', (req, res) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ 
-    error: 'Something went wrong!', 
-    message: err.message 
+  res.status(err.status || 500).json({
+    error: err.status === 400 ? 'Validation error' : 'Something went wrong!',
+    message: err.message
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`API Documentation available at http://localhost:${PORT}/api-docs`);
+async function startServer() {
+  if (!process.env.MONGODB_URI) {
+    throw new Error('MONGODB_URI must be set before starting the server.');
+  }
+
+  const client = new MongoClient(process.env.MONGODB_URI);
+  try {
+    await client.connect();
+    const database = client.db(process.env.DB_NAME || 'portfolio');
+    projectsService.setProjectsCollection(database.collection('projects'));
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+      console.log(`API Documentation available at http://localhost:${PORT}/api-docs`);
+    });
+  } catch (error) {
+    await client.close().catch(() => {});
+    throw error;
+  }
+}
+
+startServer().catch((error) => {
+  console.error('Unable to start application:', error.message);
+  process.exit(1);
 });
