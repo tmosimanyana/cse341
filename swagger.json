@@ -22,7 +22,9 @@
   "paths": {
     "/professional": {
       "get": {
-        "tags": ["Professional"],
+        "tags": [
+          "Professional"
+        ],
         "summary": "Get professional information",
         "description": "Retrieve professional profile data including name, image, description, and links",
         "responses": {
@@ -51,7 +53,9 @@
     },
     "/api/projects": {
       "get": {
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Get all projects",
         "description": "Retrieve a list of all projects in the portfolio",
         "responses": {
@@ -81,7 +85,9 @@
         }
       },
       "post": {
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Create a new project",
         "description": "Add a new project to the portfolio",
         "requestBody": {
@@ -115,6 +121,9 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required. Sign in with Google first."
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -125,12 +134,19 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
       }
     },
     "/api/projects/{id}": {
       "get": {
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Get project by ID",
         "description": "Retrieve a specific project by its ID",
         "parameters": [
@@ -189,7 +205,9 @@
         }
       },
       "put": {
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Update project",
         "description": "Update an existing project",
         "parameters": [
@@ -235,6 +253,9 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required. Sign in with Google first."
+          },
           "404": {
             "description": "Project not found",
             "content": {
@@ -255,10 +276,17 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
       },
       "delete": {
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Delete project",
         "description": "Delete a project from the portfolio",
         "parameters": [
@@ -300,6 +328,9 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required. Sign in with Google first."
+          },
           "404": {
             "description": "Project not found",
             "content": {
@@ -320,12 +351,19 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
       }
     },
     "/api/skills": {
       "get": {
-        "tags": ["Skills"],
+        "tags": [
+          "Skills"
+        ],
         "summary": "Get all skills",
         "description": "Retrieve a list of all skills in the portfolio",
         "responses": {
@@ -355,7 +393,9 @@
         }
       },
       "post": {
-        "tags": ["Skills"],
+        "tags": [
+          "Skills"
+        ],
         "summary": "Create a new skill",
         "description": "Add a new skill to the portfolio",
         "requestBody": {
@@ -404,7 +444,9 @@
     },
     "/api/skills/{id}": {
       "get": {
-        "tags": ["Skills"],
+        "tags": [
+          "Skills"
+        ],
         "summary": "Get skill by ID",
         "description": "Retrieve a specific skill by its ID",
         "parameters": [
@@ -463,7 +505,9 @@
         }
       },
       "put": {
-        "tags": ["Skills"],
+        "tags": [
+          "Skills"
+        ],
         "summary": "Update skill",
         "description": "Update an existing skill",
         "parameters": [
@@ -532,7 +576,9 @@
         }
       },
       "delete": {
-        "tags": ["Skills"],
+        "tags": [
+          "Skills"
+        ],
         "summary": "Delete skill",
         "description": "Delete a skill from the portfolio",
         "parameters": [
@@ -697,7 +743,12 @@
           },
           "status": {
             "type": "string",
-            "enum": ["Planning", "In Progress", "Completed", "On Hold"],
+            "enum": [
+              "Planning",
+              "In Progress",
+              "Completed",
+              "On Hold"
+            ],
             "example": "Completed"
           },
           "url": {
@@ -724,7 +775,13 @@
             "format": "date-time"
           }
         },
-        "required": ["_id", "title", "description", "technologies", "status"]
+        "required": [
+          "_id",
+          "title",
+          "description",
+          "technologies",
+          "status"
+        ]
       },
       "ProjectInput": {
         "type": "object",
@@ -743,7 +800,12 @@
           },
           "status": {
             "type": "string",
-            "enum": ["Planning", "In Progress", "Completed", "On Hold"],
+            "enum": [
+              "Planning",
+              "In Progress",
+              "Completed",
+              "On Hold"
+            ],
             "example": "Completed"
           },
           "url": {
@@ -762,7 +824,12 @@
             "example": "2024-03-20"
           }
         },
-        "required": ["title", "description", "technologies", "status"]
+        "required": [
+          "title",
+          "description",
+          "technologies",
+          "status"
+        ]
       },
       "Skill": {
         "type": "object",
@@ -782,7 +849,12 @@
           },
           "proficiency": {
             "type": "string",
-            "enum": ["Beginner", "Intermediate", "Advanced", "Expert"],
+            "enum": [
+              "Beginner",
+              "Intermediate",
+              "Advanced",
+              "Expert"
+            ],
             "example": "Advanced"
           },
           "description": {
@@ -802,7 +874,12 @@
             "format": "date-time"
           }
         },
-        "required": ["_id", "name", "category", "proficiency"]
+        "required": [
+          "_id",
+          "name",
+          "category",
+          "proficiency"
+        ]
       },
       "SkillInput": {
         "type": "object",
@@ -817,7 +894,12 @@
           },
           "proficiency": {
             "type": "string",
-            "enum": ["Beginner", "Intermediate", "Advanced", "Expert"],
+            "enum": [
+              "Beginner",
+              "Intermediate",
+              "Advanced",
+              "Expert"
+            ],
             "example": "Advanced"
           },
           "description": {
@@ -829,7 +911,11 @@
             "example": 3
           }
         },
-        "required": ["name", "category", "proficiency"]
+        "required": [
+          "name",
+          "category",
+          "proficiency"
+        ]
       },
       "Error": {
         "type": "object",
@@ -843,6 +929,14 @@
             "example": "Detailed error message"
           }
         }
+      }
+    },
+    "securitySchemes": {
+      "sessionCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "connect.sid",
+        "description": "Passport login session cookie from Google OAuth."
       }
     }
   }
