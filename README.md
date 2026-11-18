@@ -1,8 +1,8 @@
 # CSE341 — Portfolio API and Google OAuth Coursework
 
-A Node.js and Express coursework project containing a professional-profile endpoint, Google OAuth authentication, a protected route, Swagger UI documentation, and a MongoDB project-service module.
+A Node.js and Express coursework project with a professional-profile endpoint, Google OAuth authentication, a protected route, Swagger UI documentation, and a MongoDB-backed projects API.
 
-> **Status:** Development/coursework project. The repository has not yet been verified end-to-end with Google OAuth credentials or a running MongoDB database. Some API documentation and project-service code are present without corresponding mounted routes.
+> **Status:** Development/coursework project. Code has been connected, but the application has not yet been verified end-to-end with the user's Google OAuth credentials and MongoDB instance.
 
 ## Technology
 
@@ -13,23 +13,32 @@ A Node.js and Express coursework project containing a professional-profile endpo
 - Swagger UI and OpenAPI
 - dotenv and CORS
 
-## Routes currently mounted by the server
+## Routes
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `/` | Serves the frontend `index.html` file |
-| GET | `/health` | Basic server health response |
-| GET | `/professional` | Returns the professional profile data as JSON |
-| GET | `/auth/google` | Starts Google OAuth login |
-| GET | `/auth/google/callback` | Handles the Google OAuth callback |
-| GET | `/auth/failure` | Displays an authentication failure message |
-| GET | `/auth/logout` | Logs out the Passport session |
-| GET | `/protected` | Returns profile information to an authenticated user |
-| GET | `/api-docs` | Serves the Swagger UI |
+| Method | Path | Access | Purpose |
+|---|---|---|---|
+| GET | `/` | Public | Serves the frontend |
+| GET | `/health` | Public | Basic server health response |
+| GET | `/professional` | Public | Returns professional profile data as JSON |
+| GET | `/auth/google` | Public | Starts Google OAuth login |
+| GET | `/auth/google/callback` | OAuth callback | Completes Google sign-in |
+| GET | `/auth/failure` | Public | Displays authentication failure |
+| GET | `/auth/logout` | Signed-in session | Logs out the Passport session |
+| GET | `/protected` | Signed-in session | Returns authenticated profile information |
+| GET | `/api/projects` | Public | Lists portfolio projects |
+| GET | `/api/projects/:id` | Public | Retrieves one project |
+| POST | `/api/projects` | Google-authenticated | Creates a project |
+| PUT | `/api/projects/:id` | Google-authenticated | Updates a project |
+| DELETE | `/api/projects/:id` | Google-authenticated | Deletes a project |
+| GET | `/api-docs` | Public | Serves Swagger UI |
+
+## Project data
+
+Project records follow the existing OpenAPI schema: `title`, `description`, `technologies`, `status`, and optional `url`, `startDate`, and `endDate`. Allowed status values are `Planning`, `In Progress`, `Completed`, and `On Hold`. Creation and update requests validate the required fields, status, URL protocol, and date format.
 
 ## Local setup
 
-1. Install Node.js and npm.
+1. Install Node.js and npm, and install or run MongoDB locally.
 2. Clone the repository:
 
    ```bash
@@ -43,43 +52,48 @@ A Node.js and Express coursework project containing a professional-profile endpo
    npm install
    ```
 
-4. Copy `.env.example` to `.env` and provide your own Google OAuth credentials and a long, random session secret.
+4. Copy `.env.example` to `.env` and fill in your own values:
 
    ```bash
    cp .env.example .env
    ```
 
-5. In the Google Cloud OAuth client configuration, register the same callback URL used by `CALLBACK_URL` in `.env`.
-6. Start the application:
+5. Configure a Google OAuth client in Google Cloud. Register the exact callback URL from `CALLBACK_URL` as an authorized redirect URI.
+6. Ensure MongoDB is running and that `MONGODB_URI` and `DB_NAME` point to the intended database.
+7. Start the server:
 
    ```bash
    npm run dev
    ```
 
-The default port is 8080. Open `/api-docs` for the Swagger UI and `/health` for the basic health response.
+The default port is 8080. Visit `/health`, `/professional`, `/api/projects`, and `/api-docs` on the local server to inspect the public endpoints and API documentation.
 
 ## Environment variables
 
 - `CLIENT_ID`: Google OAuth client ID.
 - `CLIENT_SECRET`: Google OAuth client secret.
-- `SESSION_SECRET`: Long, random secret used to sign session cookies. The server now refuses to start when this value is missing.
-- `CALLBACK_URL`: Full Google OAuth callback URL. The example uses `http://localhost:8080/auth/google/callback`.
-- `PORT`: Optional server port; defaults to 8080.
+- `SESSION_SECRET`: Long, random secret used to sign session cookies; required at startup.
+- `CALLBACK_URL`: Full Google OAuth callback URL. Local example: `http://localhost:8080/auth/google/callback`.
+- `MONGODB_URI`: MongoDB connection string.
+- `DB_NAME`: MongoDB database name; defaults to `portfolio` if omitted.
+- `PORT`: Optional server port; defaults to `8080`.
+- `NODE_ENV`: Set to `production` when deployed over HTTPS.
 
-Do not commit `.env` or publish OAuth credentials.
+Never commit `.env` or publish OAuth or database credentials.
 
-## Important implementation notes
+## Security and implementation notes
 
-- The Google OAuth strategy returns the Google profile through Passport; no persistent user-account store is configured in the inspected code.
-- The protected route checks Passport authentication and returns `req.user.displayName`.
-- The professional profile endpoint currently returns hard-coded profile data.
-- A MongoDB project service module exists, with functions for listing, reading, creating, updating, and deleting projects. However, no MongoDB connection setup or project routes are currently mounted in `server.js`, so these functions are not an active API feature yet.
-- The OpenAPI document describes project endpoints that are not currently mounted by the server. Treat those documented endpoints as planned/incomplete until implemented and tested.
-- Session configuration now requires `SESSION_SECRET`, disables saving uninitialized sessions, and marks cookies secure when `NODE_ENV=production`.
-- The app has not been tested end-to-end with real Google OAuth credentials or MongoDB. The `npm test` script is currently a placeholder that exits with an error; there is no automated test suite.
+- Project reads are public. Project creation, updates, and deletion require a Google-authenticated Passport session.
+- The API documents the session cookie authentication requirement for write operations.
+- MongoDB connection is established before the HTTP server starts. The application exits with an error if `MONGODB_URI` is missing or the connection fails.
+- The Google OAuth strategy currently returns the Google profile through Passport; no persistent user-account store is configured.
+- The professional profile endpoint returns hard-coded profile data.
+- The session uses a required secret, does not save uninitialized sessions, and marks cookies secure when `NODE_ENV=production`.
+- The default Express session store is still in use; configure a persistent session store before production deployment.
+- No automated test suite is configured yet. The `npm test` script remains a placeholder. Test with a development database before using the write endpoints.
 
 ## Project scope
 
-This is a learning/coursework project. Confirm functionality locally and keep profile claims aligned with demonstrated experience before using the endpoint as a public professional portfolio.
+This is a learning/coursework project. Verify functionality locally and keep public profile claims aligned with demonstrated experience.
 
 Repository: https://github.com/tmosimanyana/cse341
