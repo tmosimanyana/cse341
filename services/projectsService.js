@@ -25,7 +25,7 @@ function validateProject(data) {
   }
   for (const key of ['startDate', 'endDate']) {
     if (data[key] !== undefined && data[key] !== '') {
-      if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(data[key]) || Number.isNaN(Date.parse(data[key]))) return false;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(data[key]) || Number.isNaN(Date.parse(data[key]))) return false;
     }
   }
   return true;
