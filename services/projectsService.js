@@ -49,8 +49,16 @@ async function getAllProjects() {
   return getCollection().find({}).sort({ createdAt: -1 }).toArray();
 }
 
+function validateId(id) {
+  if (!ObjectId.isValid(id)) {
+    const error = new Error('Project ID must be a valid MongoDB ObjectId.');
+    error.status = 400;
+    throw error;
+  }
+}
+
 async function getProjectById(id) {
-  if (!ObjectId.isValid(id)) return null;
+  validateId(id);
   return getCollection().findOne({ _id: new ObjectId(id) });
 }
 
@@ -66,7 +74,7 @@ async function createProject(data) {
 }
 
 async function updateProject(id, data) {
-  if (!ObjectId.isValid(id)) return null;
+  validateId(id);
   if (!validateProject(data)) {
     const error = new Error('Project data is invalid.');
     error.status = 400;
@@ -81,9 +89,9 @@ async function updateProject(id, data) {
 }
 
 async function deleteProject(id) {
-  if (!ObjectId.isValid(id)) return false;
+  validateId(id);
   const result = await getCollection().deleteOne({ _id: new ObjectId(id) });
   return result.deletedCount === 1;
 }
 
-module.exports = { setProjectsCollection, validateProject, getAllProjects, getProjectById, createProject, updateProject, deleteProject };
+module.exports = { setProjectsCollection, validateProject, validateId, getAllProjects, getProjectById, createProject, updateProject, deleteProject };
